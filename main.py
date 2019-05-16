@@ -1,5 +1,6 @@
 from csv import excel, DictReader
 import lmdb
+import json
 
 dial = excel
 dial.delimiter = ','
@@ -10,20 +11,42 @@ def read_file_gen(file_name):
         for r in reader:
             yield dict(r)
 
-def print_lines():
+def store_by_zone():
     gen = read_file_gen('citibike-tripdata.csv')
-    i = 0
+    db = lmdb.open('db_zone')
+    
+    with db.begin(write=True) as txn:
+        i = 0
 
-    for item in gen:
-        if i < 10:
-            print(str(i) + '\n')
-            print(item['tripduration'] + '\n')
-        i = i + 1
+        for item in gen:
+            if i < 10:
+                start_key = str(item['start station id']).encode()
+                end_key = str(item['end station id']).encode()
 
-    print(str(i))
+                start_val = txn.get(start_key)
+                if start_val is None:
+                    txn.put(start_key, json.dumps({'start': [item], 'end': []}).encode())
+                else:
+                    start_val = json.loads(start_val)
+                    start_val['start'].append(item)
+                    txn.put(start_key, json.dumps(start_val).encode())
 
-print_lines()
+                end_val = txn.get(end_key)
+                if end_val is None:
+                    txn.put(end_key, json.dumps({'start': [], 'end': [item]}).encode())
+                else:
+                    end_val = json.loads(end_val)
+                    end_val['end'].append(item)
+                    txn.put(end_key, json.dumps(end_val).encode())
+            else:
+                break
+            i = i + 1
 
-# env = lmdb.open('db')
+store_by_zone()
 
-# with env.begin(write=True) as txn:
+# Verify
+db = lmdb.open('db_zone')
+with db.begin(write=True) as txn:
+    data = txn.get(b'254')
+    data = json.loads(data)
+    print(data['start'])
