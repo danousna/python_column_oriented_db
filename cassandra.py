@@ -1,5 +1,6 @@
 from csv import excel, DictReader
 import cassandra
+import cassandra.cluster
 
 dial = excel
 dial.delimiter = ','
