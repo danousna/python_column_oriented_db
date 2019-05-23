@@ -1,4 +1,4 @@
-CREATE TABLE danousna_zone (
+CREATE TABLE danousna_td_zone (
     tripduration int,
     starttime timestamp,
     stoptime timestamp,
@@ -15,9 +15,9 @@ CREATE TABLE danousna_zone (
     birth_year int,
     gender boolean,
     PRIMARY KEY ((start_station_id, end_station_id), starttime, bikeid)
-)
+);
 
-CREATE TABLE danousna_time (
+CREATE TABLE danousna_td_time (
     tripduration int,
     starttime timestamp,
     startday text,
@@ -36,9 +36,9 @@ CREATE TABLE danousna_time (
     birth_year int,
     gender boolean,
     PRIMARY KEY ((startday, starthour), starttime, bikeid)
-)
+);
 
-CREATE TABLE danousna_day (
+CREATE TABLE danousna_td_day (
     tripduration int,
     starttime timestamp,
     dayofweek int,
@@ -56,4 +56,4 @@ CREATE TABLE danousna_day (
     birth_year int,
     gender boolean,
     PRIMARY KEY ((dayofweek), start_station_id, end_station_id, starttime, bikeid)
-)
+);

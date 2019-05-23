@@ -1,1 +1,2 @@
 lmdb==0.94
+cassandra-driver==3.17.1
