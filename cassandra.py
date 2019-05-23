@@ -1,6 +1,6 @@
 from csv import excel, DictReader
 import cassandra
-import cassandra.cluster
+from cassandra.cluster import Cluster
 
 dial = excel
 dial.delimiter = ','
@@ -59,7 +59,7 @@ def store_by_zone(c):
             break
         i = i + 1
 
-c = cassandra.cluster.Cluster(['localhost'])
+c = Cluster(['localhost'])
 c = c.connect('danousna_citibike_station')
 
 store_by_zone(c)
