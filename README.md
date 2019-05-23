@@ -44,6 +44,12 @@ nombre minimal de requête.
 Insérer les données, et fournissez le code répondant aux questions en un nombre
 minimal de requètes.
 
-# Fin
+# Réponses
 
-Bon courage.
+On peut modéliser trois bases de données pour les 3 questions.
+
+1. Clé de partitionnement `station_id, start|end` et cli de tri sur `start_time`.
+2. Clé de partitionnement `jour` et clé de tri `heure`.
+3. Clé de partitionnement `jour` et clé de tri `station_id`.
+
+On crée le tables via des .sql ou directement à la main dans cqlsh. Dérrière, on importe les données via Python. On peut donc faire des traitement avant l'import.
