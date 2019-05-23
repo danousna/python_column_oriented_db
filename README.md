@@ -53,3 +53,5 @@ On peut modéliser trois bases de données pour les 3 questions.
 3. Clé de partitionnement `jour` et clé de tri `station_id`.
 
 On crée le tables via des .sql ou directement à la main dans cqlsh. Dérrière, on importe les données via Python. On peut donc faire des traitement avant l'import.
+
+On se co en ssh et on utilise le python w/ cassandra du server remote.

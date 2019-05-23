@@ -1,6 +1,5 @@
 from csv import excel, DictReader
-import lmdb
-import json
+# import cassandra
 
 dial = excel
 dial.delimiter = ','
@@ -11,42 +10,60 @@ def read_file_gen(file_name):
         for r in reader:
             yield dict(r)
 
-def store_by_zone():
+def store_by_zone(c):
     gen = read_file_gen('citibike-tripdata.csv')
-    db = lmdb.open('db_zone')
-    
-    with db.begin(write=True) as txn:
-        i = 0
+    i = 0
 
-        for item in gen:
-            if i < 10:
-                start_key = str(item['start station id']).encode()
-                end_key = str(item['end station id']).encode()
+    # We remove last char of time data because cassandra doesn't like precision 4 on seconds.
+    for item in gen:
+        if i < 10:
+            query = """
+                INSERT INTO danousna_td_zone (
+                    tripduration, 
+                    starttime, 
+                    stoptime, 
+                    start_station_id, 
+                    start_station_name, 
+                    start_station_latitude, 
+                    start_station_longitude, 
+                    end_station_id, 
+                    end_station_name, 
+                    end_station_latitude, 
+                    end_station_longitude, 
+                    bikeid, 
+                    usertype, 
+                    birth_year, 
+                    gender
+                )
+                VALUES ( 
+                    {item['tripduration']},
+                    {item['starttime'][:-1]},
+                    {item['stoptime'][:-1]},
+                    {item['start station id']},
+                    {item['start station name']},
+                    {item['start station latitude']},
+                    {item['start station longitude']},
+                    {item['end station id']},
+                    {item['end station name']},
+                    {item['end station latitude']},
+                    {item['end station longitude']},
+                    {item['bikeid']},
+                    {item['usertype']},
+                    {item['birth year']},
+                    {item['gender']} 
+                 )
+            """
+            c.execute(query)
+        else:
+            break
+        i = i + 1
 
-                start_val = txn.get(start_key)
-                if start_val is None:
-                    txn.put(start_key, json.dumps({'start': [item], 'end': []}).encode())
-                else:
-                    start_val = json.loads(start_val)
-                    start_val['start'].append(item)
-                    txn.put(start_key, json.dumps(start_val).encode())
+c = cassandra.cluster.Cluster(['localhost'])
+c = c.connect('danousna_citibike_station')
 
-                end_val = txn.get(end_key)
-                if end_val is None:
-                    txn.put(end_key, json.dumps({'start': [], 'end': [item]}).encode())
-                else:
-                    end_val = json.loads(end_val)
-                    end_val['end'].append(item)
-                    txn.put(end_key, json.dumps(end_val).encode())
-            else:
-                break
-            i = i + 1
+store_by_zone(c)
 
-store_by_zone()
+results = c.execute('select * from danousna_td_zone;')
 
-# Verify
-db = lmdb.open('db_zone')
-with db.begin(write=True) as txn:
-    data = txn.get(b'254')
-    data = json.loads(data)
-    print(data['start'])
+for r in results:
+    print(r)
