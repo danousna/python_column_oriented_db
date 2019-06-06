@@ -127,7 +127,7 @@ def tripduration_distribution(c):
     # Get min and max
     result =  c.execute("select min(tripduration) as min, max(tripduration) as max from chembise_tmp.day_bike where day = '2019-04-01';")
     
-    spacing = (result.max - result.max) / 10
+    spacing = (result[0].max - result[0].max) / 10
     hist = []
     for i in range(10):
         hist[i] = {
@@ -142,7 +142,7 @@ def tripduration_distribution(c):
 
 c = cassandra.cluster.Cluster(['localhost'])
 c = c.connect('danousna_citibike_station')
-
+    
 # store_by_zone(c)
 # store_by_day(c)
 
