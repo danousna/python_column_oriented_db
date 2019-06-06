@@ -123,13 +123,16 @@ def store_by_day(c):
             break
         i = i + 1
 
+def distribution(data, var):
+    # Get min and max 
+    for r in results:
+        print(r)
+
 c = cassandra.cluster.Cluster(['localhost'])
 c = c.connect('danousna_citibike_station')
 
 # store_by_zone(c)
-store_by_day(c)
+# store_by_day(c)
 
-results = c.execute('select * from danousna_citibike_station.day;')
-
-for r in results:
-    print(r)
+results = c.execute('select * from chembise_tmp.day_bike;')
+tripduration_distribution = distribution(results, 'tripduration')
