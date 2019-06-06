@@ -1,3 +1,4 @@
+import re
 from csv import excel, DictReader
 import cassandra
 import cassandra.cluster
@@ -92,7 +93,7 @@ def store_by_day(c):
             dateparser = re.compile(
                 "(?P<year>\d+)-(?P<month>\d+)-(?P<day>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<seconds>\d+\.?\d*)"
             )
-            match_start = dateparser.match(r["starttime"])
+            match_start = dateparser.match(item["starttime"])
             if not match_start:
                 continue
             start = match_start.groupdict()
