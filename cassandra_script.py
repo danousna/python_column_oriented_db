@@ -131,8 +131,8 @@ def tripduration_distribution(c):
     hist = []
     for i in range(10):
         hist[i] = {
-            'min': result.min + i * spacing,
-            'max': result.min + (i + 1) * spacing,
+            'min': result[0].min + i * spacing,
+            'max': result[0].min + (i + 1) * spacing,
             'n': 0
         }
         print(hist[i])
