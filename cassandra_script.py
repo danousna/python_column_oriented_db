@@ -64,7 +64,7 @@ def store_by_day(c):
     i = 0
 
     c.execute("""
-        create table danousna_citibike_station.day (
+        CREATE TABLE IF NOT EXISTS danousna_citibike_station.day (
             day_date text,
             tripduration int, 
             starttime timestamp, 
@@ -80,16 +80,63 @@ def store_by_day(c):
             bikeid int, 
             usertype text, 
             birth_year int, 
-            gender boolean
+            gender boolean,
+
+            PRIMARY KEY (day_date)
         )
     """)
 
     # We remove last char of time data because cassandra doesn't like precision 4 on seconds.
     for item in gen:
         if i < 10:
+            dateparser = re.compile(
+                "(?P<year>\d+)-(?P<month>\d+)-(?P<day>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<seconds>\d+\.?\d*)"
+            )
+            match_start = dateparser.match(r["starttime"])
+            if not match_start:
+                continue
+            start = match_start.groupdict()
+            item["day_date"] = start["year"] + '-' + start["month"] + '-' + start["day"]
+
             query = """
+                INSERT INTO danousna_citibike_station.day (
+                    day_date,
+                    tripduration, 
+                    starttime, 
+                    stoptime, 
+                    start_station_id, 
+                    start_station_name, 
+                    start_station_latitude, 
+                    start_station_longitude, 
+                    end_station_id, 
+                    end_station_name, 
+                    end_station_latitude, 
+                    end_station_longitude, 
+                    bikeid, 
+                    usertype, 
+                    birth_year, 
+                    gender
+                )
+                VALUES ( 
+                    {item['day_date'}],
+                    {item['tripduration']}, 
+                    {item['starttime'][:-1]},
+                    {item['stoptime'][:-1]},
+                    {item['start station id']},
+                    {item['start station name']},
+                    {item['start station latitude']},
+                    {item['start station longitude']},
+                    {item['end station id']},
+                    {item['end station name']},
+                    {item['end station latitude']},
+                    {item['end station longitude']},
+                    {item['bikeid']}, 
+                    {item['usertype']}, 
+                    {item['birth year']}, 
+                    {item['gender']}
+                 )
             """
-            # c.execute(query)
+            c.execute(query)
         else:
             break
         i = i + 1
