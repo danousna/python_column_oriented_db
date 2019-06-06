@@ -59,12 +59,48 @@ def store_by_zone(c):
             break
         i = i + 1
 
+def store_by_day(c):
+    gen = read_file_gen('citibike-tripdata.csv')
+    i = 0
+
+    c.execute("""
+        create table danousna_citibike_station.day (
+            day_date text,
+            tripduration int, 
+            starttime timestamp, 
+            stoptime timestamp, 
+            start_station_id int, 
+            start_station_name int, 
+            start_station_latitude text, 
+            start_station_longitude text, 
+            end_station_id int, 
+            end_station_name text, 
+            end_station_latitude text, 
+            end_station_longitude text, 
+            bikeid int, 
+            usertype text, 
+            birth_year int, 
+            gender boolean
+        )
+    """)
+
+    # We remove last char of time data because cassandra doesn't like precision 4 on seconds.
+    for item in gen:
+        if i < 10:
+            query = """
+            """
+            # c.execute(query)
+        else:
+            break
+        i = i + 1
+
 c = cassandra.cluster.Cluster(['localhost'])
 c = c.connect('danousna_citibike_station')
 
-store_by_zone(c)
+# store_by_zone(c)
+store_by_day(c)
 
-results = c.execute('select * from danousna_td_zone;')
+results = c.execute('select * from danousna_citibike_station.day;')
 
 for r in results:
     print(r)
