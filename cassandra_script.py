@@ -119,7 +119,7 @@ def store_by_day(c):
                     gender
                 )
                 VALUES ( 
-                    '{item['day_date'}]',
+                    '{item['day_date']}',
                     {item['tripduration']}, 
                     {item['starttime'][:-1]},
                     {item['stoptime'][:-1]},
