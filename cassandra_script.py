@@ -99,45 +99,26 @@ def store_by_day(c):
             start = match_start.groupdict()
             item["day_date"] = start["year"] + '-' + start["month"] + '-' + start["day"]
 
-            query = """
-                INSERT INTO danousna_citibike_station.day (
-                    day_date,
-                    tripduration, 
-                    starttime, 
-                    stoptime, 
-                    start_station_id, 
-                    start_station_name, 
-                    start_station_latitude, 
-                    start_station_longitude, 
-                    end_station_id, 
-                    end_station_name, 
-                    end_station_latitude, 
-                    end_station_longitude, 
-                    bikeid, 
-                    usertype, 
-                    birth_year, 
-                    gender
-                )
-                VALUES ( 
-                    '{item['day_date']}',
-                    {item['tripduration']}, 
-                    {item['starttime'][:-1]},
-                    {item['stoptime'][:-1]},
-                    {item['start station id']},
-                    '{item['start station name']}',
-                    '{item['start station latitude']}',
-                    '{item['start station longitude']}',
-                    {item['end station id']},
-                    '{item['end station name']}',
-                    '{item['end station latitude']}',
-                    '{item['end station longitude']}',
-                    {item['bikeid']}, 
-                    '{item['usertype']}', 
-                    {item['birth year']}, 
-                    {item['gender']}
-                 )
-            """
-            c.execute(query)
+            query = "INSERT INTO danousna_citibike_station.day (day_date, tripduration, starttime, stoptime, start_station_id, start_station_name, start_station_latitude, start_station_longitude, end_station_id, end_station_name, end_station_latitude, end_station_longitude, bikeid, usertype, birth_year, gender) VALUES ('{}', {}, {}, {}, {}, '}', '{}', '{}', {}, '{}', '{}', '{}', {}, '{}', {}, {} )".format(
+                item['day_date'], 
+                item['tripduration'],
+                item['starttime'][:-1], 
+                item['stoptime'][:-1], 
+                item['start station id'], 
+                item['start station name'], 
+                item['start station latitude'], 
+                item['start station longitude'], 
+                item['end station id'], 
+                item['end station name'], 
+                item['end station latitude'], 
+                item['end station longitude'], 
+                item['bikeid'], 
+                item['usertype'], 
+                item['birth year'], 
+                item['gender']
+            )
+            print(query)
+            # c.execute(query)
         else:
             break
         i = i + 1
